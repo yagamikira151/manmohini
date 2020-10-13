@@ -166,9 +166,57 @@ exports.listCategories=(req,res)=>{
     Product.distinct("category",{},(err,categories)=>{
         if(err){
             return res.status(400).json({
-                error:"Product not found"
+                error:"category not found"
             })
         }
         res.json(categories)
     })
+}
+
+exports.listBySearch=(req,res)=>{
+    let order =req.query.order?req.query.order:'desc'
+    let sortBy =req.query.sortBy?req.query.sortBy:'_id'
+    let limit =req.query.limit?parseInt(req.query.limit):100;
+    let skip=parseInt(req.body.skip);
+    let findAgrs={};
+
+    for(let key in req.body.filters){
+        if(req.body.filters[key].length>0){
+            if(key==="price"){
+                findAgrs[key]={
+                    $gte:req.body.filters[key][0],
+                    $lte:req.body.filters[key][1]
+                };
+            }else{
+                findAgrs[key]=req.body.filters[key];
+            }
+        }
+    }
+
+    Product.find(findAgrs)
+        .select("-photo")
+        .populate("category")
+        .sort([[sortBy,order]])
+        .skip(skip)
+        .limit(limit)
+        .exec((err,data)=>{
+            if(err){
+                return res.status(400).json({
+                    error:"Product not found"
+                })
+            }
+            res.json({
+                size:data.length,
+                data
+            });
+        });
+    
+};
+
+exports.photo=(req,res,next)=>{
+    if(req.product.photo.data){
+        res.set('Content-Type',req.product.photo.contentType)
+        return res.send(req.product.photo.data)
+    }
+    next();
 }
