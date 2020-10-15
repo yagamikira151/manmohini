@@ -34,6 +34,7 @@ exports.create=(req,res)=>{
         // check for all  fields
         const {name,description,price,category,quantity,shipping}=fields
         if(!name||!description||!price||!category||!quantity||!shipping){
+            // console.log(name,description,price,category,quantity,shipping);
             return res.status(400).json({
                 error:'Some of the fields are empty'
             })
@@ -147,7 +148,7 @@ exports.list=(req,res)=>{
 }
 
 exports.listRelated=(req,res)=>{
-    let limit=req.query.limit?parseInt(req.query.limit):100
+    let limit=req.body.limit?parseInt(req.body.limit):100
     Product.find({_id:{$ne:req.product},category:req.product.category})
     .limit(limit)
     .select("-photo")
@@ -174,12 +175,12 @@ exports.listCategories=(req,res)=>{
 }
 
 exports.listBySearch=(req,res)=>{
-    let order =req.query.order?req.query.order:'desc'
-    let sortBy =req.query.sortBy?req.query.sortBy:'_id'
-    let limit =req.query.limit?parseInt(req.query.limit):100;
+    let order =req.body.order?req.body.order:'desc'
+    let sortBy =req.body.sortBy?req.body.sortBy:'_id'
+    let limit =req.body.limit?parseInt(req.body.limit):100;
     let skip=parseInt(req.body.skip);
     let findAgrs={};
-
+    console.log(order,sortBy,limit,skip);
     for(let key in req.body.filters){
         if(req.body.filters[key].length>0){
             if(key==="price"){
@@ -219,4 +220,23 @@ exports.photo=(req,res,next)=>{
         return res.send(req.product.photo.data)
     }
     next();
+}
+
+
+exports.listSearch=(req,res)=>{
+    const query={}
+    if(req.query.search){
+        query.name={$regex:req.query.search,$options:'i'}
+        if(req.query.category&&req.query.category!='All'){
+            query.category=req.query.category;
+        }
+        Product.find(query,(err,products)=>{
+            if(err){
+                return res.status(400).json({
+                    error:errorHandler(err)
+                })
+            }
+            res.json(products)
+        }).select('-photo')
+    }
 }
