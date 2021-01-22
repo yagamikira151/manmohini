@@ -9,7 +9,9 @@ const category = require('../models/category');
 
 
 exports.productById=(req,res,next,id)=>{
-    Product.findById(id).exec((err,product)=>{
+    Product.findById(id)
+    .populate("category")
+    .exec((err,product)=>{
         if(err||!product){
             return res.status(400).json({
                 error:'Product could not be Found!'
