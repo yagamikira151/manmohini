@@ -98,17 +98,17 @@ exports.update=(req,res)=>{
         let product= req.product
         product=_.extend(product,fields)
         // check for all  fields
-        const {name,description,price,category,quantity,shipping}=fields
-        if(!name||!description||!price||!category||!quantity||!shipping){
-            return res.status(400).json({
-                error:'Some of the fields are empty'
-            })
-        }
-        if(!files.photo){
-            return res.status(400).json({
-                error:'Please upload an Image'
-            })
-        }
+        // const {name,description,price,category,quantity,shipping}=fields
+        // if(!name||!description||!price||!category||!quantity||!shipping){
+        //     return res.status(400).json({
+        //         error:'Some of the fields are empty'
+        //     })
+        // }
+        // if(!files.photo){
+        //     return res.status(400).json({
+        //         error:'Please upload an Image'
+        //     })
+        // }
         if(files.photo){
             if(files.photo.size>1000000){
                 return res.status(400).json({
