@@ -12,7 +12,7 @@ const expressValidator = require('express-validator');
 const app=express();
 
 // db
-mongoose.connect("mongodb://localhost/yagamikira",{ useNewUrlParser: true , useUnifiedTopology: true,
+mongoose.connect(process.env.DATABASE,{ useNewUrlParser: true , useUnifiedTopology: true,
     useCreateIndex: true,
     useFindAndModify: false
 }).then(()=>console.log("DB connected"))
